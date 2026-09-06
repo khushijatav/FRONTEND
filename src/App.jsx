@@ -1,32 +1,75 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// Components
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
-import Home from "./pages/Home";
+// Pages
+import Home from "./Pages/Home";
 import ServicesPage from "./pages/ServicesPage";
 import CounselorsPage from "./pages/CounselorsPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import ServiceDetail from "./Pages/ServiceDetail";
 
 const App = () => {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-[#f7fbfa] text-slate-800">
 
+        {/* Navbar */}
         <Navbar />
 
+        {/* Pages */}
         <main>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/counselors" element={<CounselorsPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
+
+            {/* Home */}
+            <Route
+              path="/"
+              element={<Home />}
+            />
+
+            {/* Services */}
+            <Route
+              path="/services"
+              element={<ServicesPage />}
+            />
+            {/* Service Detail */}
+            <Route
+              path="/services/:id"
+              element={<ServiceDetail />}
+            />
+
+            {/* Counselors */}
+            <Route
+              path="/counselors"
+              element={<CounselorsPage />}
+            />
+
+            {/* About */}
+            <Route
+              path="/about"
+              element={<AboutPage />}
+            />
+
+            {/* Contact + Booking */}
+            <Route
+              path="/contact"
+              element={<ContactPage />}
+            />
+
+            {/* If wrong URL */}
+            <Route
+              path="*"
+              element={<Home />}
+            />
+
           </Routes>
         </main>
 
+        {/* Footer */}
         <Footer />
 
       </div>
