@@ -1,11 +1,11 @@
 import React from "react";
 
-import Hero from "../components/Hero";
-import Services from "../components/Services";
-import About from "../components/About";
-import Counselors from "../components/Counselors";
-import Testimonials from "../components/Testimonials";
-import Booking from "../components/Booking";
+import Hero from "../Components/Hero";
+import Services from "../Components/Services";
+import About from "../Components/About";
+import Counselors from "../Components/Counselors";
+import Testimonials from "../Components/Testimonials";
+import Booking from "../Components/Booking";
 
 const Home = () => {
   return (
