@@ -1,5 +1,5 @@
 import React from "react";
-import Counselors from "../components/Counselors";
+import Counselors from "../Components/Counselors";
 
 const CounselorsPage = () => {
   return (

@@ -1,5 +1,5 @@
 import React from "react";
-import Booking from "../components/Booking";
+import Booking from "../Components/Booking";
 
 const ContactPage = () => {
   return (
