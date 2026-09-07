@@ -6,12 +6,12 @@ import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 
 // Pages
-import Home from "./pages/Home";
-import ServicesPage from "./pages/ServicesPage";
-import CounselorsPage from "./pages/CounselorsPage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
-import ServiceDetail from "./pages/ServiceDetail";
+import Home from "./Pages/Home";
+import ServicesPage from "./Pages/ServicesPage";
+import CounselorsPage from "./Pages/CounselorsPage";
+import AboutPage from "./Pages/AboutPage";
+import ContactPage from "./Pages/ContactPage";
+import ServiceDetail from "./Pages/ServiceDetail";
 
 const App = () => {
   return (
