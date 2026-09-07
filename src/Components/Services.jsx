@@ -97,21 +97,17 @@
 
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { axiosInstance } from "../Service/axiosInst";
 
 const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/services")
+    axiosInstance.get("/api/services")
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch services");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setServices(data);
+        console.log("Fetched services:", response);
+        setServices(response.data);
         setLoading(false);
       })
       .catch((error) => {
@@ -153,7 +149,7 @@ const Services = () => {
         {/* Service Cards */}
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
-          {services.map((service) => (
+          {Array.isArray(services) && services.map((service) => (
             <div
               key={service._id}
               className="rounded-3xl border border-slate-100 bg-[#f8fcfb] p-7 transition duration-300 hover:-translate-y-2 hover:shadow-xl"
