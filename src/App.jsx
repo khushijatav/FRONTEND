@@ -11,7 +11,7 @@ import ServicesPage from "./pages/ServicesPage";
 import CounselorsPage from "./pages/CounselorsPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
-import ServiceDetail from "./Pages/ServiceDetail";
+import ServiceDetail from "./pages/ServiceDetail";
 
 const App = () => {
   return (
