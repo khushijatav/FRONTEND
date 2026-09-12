@@ -104,7 +104,7 @@ const Services = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axiosInstance.get("/api/services")
+    axiosInstance.get(`${import.meta.env.VITE_PUBLIC_API_URL}/api/services`)
       .then((response) => {
         console.log("Fetched services:", response);
         setServices(response.data);

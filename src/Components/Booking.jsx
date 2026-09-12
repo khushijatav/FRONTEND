@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 const Booking = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -23,7 +22,7 @@ const Booking = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/bookings",
+        `${import.meta.env.VITE_PUBLIC_API_URL}/api/bookings`,
         {
           method: "POST",
           headers: {
