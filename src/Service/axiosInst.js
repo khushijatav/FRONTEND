@@ -1,8 +1,12 @@
 import axios from "axios";
-console.log("API URL:", import.meta.env.VITE_PUBLIC_API_URL);
+
+const rawBaseUrl = import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:5000";
+// Strip trailing slash if present
+const API_BASE_URL = rawBaseUrl.replace(/\/+$/, "");
+
 export const axiosInstance = axios.create({
-  baseURL:import.meta.env.VITE_PUBLIC_API_URL,
-  withCredentials: true,
+  baseURL: API_BASE_URL,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -11,9 +15,6 @@ export const axiosInstance = axios.create({
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Add anything required before every request
-    // Example: tenant ID, access token, etc.
-
     return config;
   },
   (error) => {
@@ -26,12 +27,13 @@ axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
-  async (error) => {
-    if (error.response?.status === 401) {
-      // Handle authentication expiry
-      // e.g. refresh token / logout / redirect to login
-    }
-
-    return Promise.reject(error);
+  (error) => {
+    const errorMsg =
+      error.response?.data?.message ||
+      error.message ||
+      "An unexpected network error occurred";
+    return Promise.reject(new Error(errorMsg));
   }
 );
+
+export default axiosInstance;

@@ -1,5 +1,3 @@
-import React from "react";
-
 import Hero from "../Components/Hero";
 import Services from "../Components/Services";
 import About from "../Components/About";
@@ -11,9 +9,9 @@ const Home = () => {
   return (
     <>
       <Hero />
-      <Services />
+      <Services limit={4} />
       <About />
-      <Counselors />
+      <Counselors limit={3} />
       <Testimonials />
       <Booking />
     </>

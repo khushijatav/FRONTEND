@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Components
@@ -16,62 +15,40 @@ import ServiceDetail from "./Pages/ServiceDetail";
 const App = () => {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#f7fbfa] text-slate-800">
+      <div className="min-h-screen bg-[#f7fbfa] text-slate-800 flex flex-col justify-between selection:bg-emerald-100 selection:text-emerald-900">
+        <div>
+          {/* Global Header */}
+          <Navbar />
 
-        {/* Navbar */}
-        <Navbar />
+          {/* Main Routed Content */}
+          <main>
+            <Routes>
+              {/* Home */}
+              <Route path="/" element={<Home />} />
 
-        {/* Pages */}
-        <main>
-          <Routes>
+              {/* Services & Counselor Bookings Desk */}
+              <Route path="/services" element={<ServicesPage />} />
 
-            {/* Home */}
-            <Route
-              path="/"
-              element={<Home />}
-            />
+              {/* Service Detail */}
+              <Route path="/services/:id" element={<ServiceDetail />} />
 
-            {/* Services */}
-            <Route
-              path="/services"
-              element={<ServicesPage />}
-            />
-            {/* Service Detail */}
-            <Route
-              path="/services/:id"
-              element={<ServiceDetail />}
-            />
+              {/* Counselors */}
+              <Route path="/counselors" element={<CounselorsPage />} />
 
-            {/* Counselors */}
-            <Route
-              path="/counselors"
-              element={<CounselorsPage />}
-            />
+              {/* About */}
+              <Route path="/about" element={<AboutPage />} />
 
-            {/* About */}
-            <Route
-              path="/about"
-              element={<AboutPage />}
-            />
+              {/* Contact + Booking */}
+              <Route path="/contact" element={<ContactPage />} />
 
-            {/* Contact + Booking */}
-            <Route
-              path="/contact"
-              element={<ContactPage />}
-            />
+              {/* Fallback to Home if unknown route */}
+              <Route path="*" element={<Home />} />
+            </Routes>
+          </main>
+        </div>
 
-            {/* If wrong URL */}
-            <Route
-              path="*"
-              element={<Home />}
-            />
-
-          </Routes>
-        </main>
-
-        {/* Footer */}
+        {/* Global Footer */}
         <Footer />
-
       </div>
     </BrowserRouter>
   );
