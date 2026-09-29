@@ -7,12 +7,30 @@ import axios from "axios";
  *    Automatically direct requests to http://<current-ip>:5000 so phones don't fail by calling localhost.
  * 3. In local PC browser (localhost / 127.0.0.1): use http://localhost:5000.
  */
+const DEFAULT_PROD_API_URL = "https://backend-2-6y7v.onrender.com";
+
+/**
+ * Dynamically resolves the backend API Base URL:
+ * 1. If accessed over HTTPS (e.g. deployed on Vercel/Netlify), it MUST use HTTPS backend to prevent Mixed Content blocking.
+ * 2. If accessed via local Wi-Fi / LAN IP (e.g. http://192.168.0.105:5173), route to http://<lan-ip>:5000.
+ * 3. If accessed on local PC (http://localhost:5173), route to http://localhost:5000.
+ */
 export const getApiBaseUrl = () => {
   const envUrl = (import.meta.env.VITE_PUBLIC_API_URL || "").trim().replace(/\/+$/, "");
 
   // Running inside a browser
   if (typeof window !== "undefined" && window.location) {
-    const { hostname } = window.location;
+    const { hostname, protocol } = window.location;
+    const isHttps = protocol === "https:";
+
+    // 1. If the website is loaded over HTTPS (like *.vercel.app, *.netlify.app, *.onrender.com):
+    // MUST use an HTTPS backend to prevent browser Mixed Content blocking!
+    if (isHttps) {
+      if (envUrl && envUrl.startsWith("https://")) {
+        return envUrl;
+      }
+      return DEFAULT_PROD_API_URL;
+    }
 
     // Check if accessing via LAN IP (e.g. 192.168.x.x, 10.x.x.x, 172.16-31.x.x, or local domain)
     const isLanIp =
@@ -21,17 +39,17 @@ export const getApiBaseUrl = () => {
       /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
       hostname.endsWith(".local");
 
-    // 1. If accessing via local Wi-Fi / LAN IP from phone or tablet, connect to local backend on port 5000
+    // 2. If accessing via local Wi-Fi / LAN IP from phone or tablet, connect to local backend on port 5000
     if (isLanIp) {
       return `http://${hostname}:5000`;
     }
 
-    // 2. If accessing on local PC browser (localhost / 127.0.0.1)
+    // 3. If accessing on local PC browser (localhost / 127.0.0.1)
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return "http://localhost:5000";
     }
 
-    // 3. If hosted on a cloud domain (like *.vercel.app, *.netlify.app, *.onrender.com)
+    // 4. If hosted on a cloud domain over HTTP
     if (envUrl) {
       return envUrl;
     }
@@ -42,7 +60,7 @@ export const getApiBaseUrl = () => {
     return envUrl;
   }
 
-  return envUrl || "http://localhost:5000";
+  return DEFAULT_PROD_API_URL;
 };
 
 export const axiosInstance = axios.create({
