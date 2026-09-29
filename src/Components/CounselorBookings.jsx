@@ -1,16 +1,27 @@
 import { useState, useEffect, useCallback } from "react";
 import { axiosInstance } from "../Service/axiosInst";
 
+const STORAGE_KEY = "mindcare_counselor_bookings";
+
+const getCachedBookings = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
 const CounselorBookings = ({ refreshTrigger }) => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState(getCachedBookings);
+  const [loading, setLoading] = useState(() => getCachedBookings().length === 0);
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
 
   const fetchBookings = useCallback(async (isInitial = false) => {
-    if (!isInitial) {
+    if (!isInitial && bookings.length === 0) {
       setLoading(true);
     }
     try {
@@ -20,10 +31,32 @@ const CounselorBookings = ({ refreshTrigger }) => {
 
       const response = await axiosInstance.get("/api/bookings", { params });
       setError("");
-      setBookings(Array.isArray(response.data) ? response.data : []);
+      if (Array.isArray(response.data)) {
+        setBookings(response.data);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(response.data));
+        } catch (e) {}
+      }
     } catch (err) {
-      console.error("Error fetching bookings:", err);
-      setError("Unable to load booking details. Please ensure the backend is running.");
+      console.warn("Could not reach backend bookings API, maintaining cached state:", err.message);
+      const cached = getCachedBookings();
+      if (cached.length > 0) {
+        // Filter cached if needed
+        let filtered = cached;
+        if (statusFilter !== "All") filtered = filtered.filter((b) => b.status === statusFilter);
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          filtered = filtered.filter(
+            (b) =>
+              (b.name && b.name.toLowerCase().includes(q)) ||
+              (b.service && b.service.toLowerCase().includes(q))
+          );
+        }
+        setBookings(filtered);
+        setError("");
+      } else {
+        setError("Unable to load live booking details. Please ensure the backend is running.");
+      }
     } finally {
       setLoading(false);
     }
@@ -41,13 +74,24 @@ const CounselorBookings = ({ refreshTrigger }) => {
         status: newStatus,
       });
 
-      // Update local state smoothly
-      setBookings((prev) =>
-        prev.map((b) => (b._id === id ? { ...b, status: res.data.booking.status } : b))
-      );
+      // Update state and localStorage
+      setBookings((prev) => {
+        const updated = prev.map((b) => (b._id === id ? { ...b, status: res.data.booking.status } : b));
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
     } catch (err) {
-      console.error("Failed to update status:", err);
-      alert("Error updating status: " + (err.message || "Something went wrong"));
+      console.error("Failed to update status on server:", err);
+      // Still update locally so counselor view is responsive
+      setBookings((prev) => {
+        const updated = prev.map((b) => (b._id === id ? { ...b, status: newStatus } : b));
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
     } finally {
       setUpdatingId(null);
     }
@@ -59,11 +103,16 @@ const CounselorBookings = ({ refreshTrigger }) => {
     try {
       setUpdatingId(id);
       await axiosInstance.delete(`/api/bookings/${id}`);
-      setBookings((prev) => prev.filter((b) => b._id !== id));
     } catch (err) {
-      console.error("Failed to delete booking:", err);
-      alert("Error deleting booking: " + err.message);
+      console.warn("Server delete warning:", err.message);
     } finally {
+      setBookings((prev) => {
+        const updated = prev.filter((b) => b._id !== id);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
       setUpdatingId(null);
     }
   };

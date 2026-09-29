@@ -4,14 +4,31 @@ import CounselorBookings from "../Components/CounselorBookings";
 import Booking from "../Components/Booking";
 
 const ServicesPage = () => {
-  const [activeTab, setActiveTab] = useState("services"); // "services" | "bookings" | "book-now"
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const hash = window.location.hash;
+      if (hash === "#counselor-bookings" || hash === "#bookings") return "bookings";
+      if (hash === "#book-now") return "book-now";
+      const saved = sessionStorage.getItem("mindcare_services_tab");
+      return saved || "services";
+    } catch {
+      return "services";
+    }
+  });
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const changeTab = (tab) => {
+    setActiveTab(tab);
+    try {
+      sessionStorage.setItem("mindcare_services_tab", tab);
+    } catch (e) {}
+  };
 
   const handleBookingSuccess = () => {
     // Increment trigger to reload bookings in CounselorBookings component
     setRefreshTrigger((prev) => prev + 1);
     // Switch tab to bookings so counselor/user can view the newly added card!
-    setActiveTab("bookings");
+    changeTab("bookings");
   };
 
   return (
@@ -35,7 +52,7 @@ const ServicesPage = () => {
             {/* View Selector Switch */}
             <div className="inline-flex rounded-2xl bg-slate-100 p-1.5 border border-slate-200 self-start md:self-auto">
               <button
-                onClick={() => setActiveTab("services")}
+                onClick={() => changeTab("services")}
                 className={`rounded-xl px-4 py-2 text-xs font-bold transition ${
                   activeTab === "services"
                     ? "bg-white text-emerald-800 shadow-sm"
@@ -45,7 +62,7 @@ const ServicesPage = () => {
                 🌿 Browse Services
               </button>
               <button
-                onClick={() => setActiveTab("bookings")}
+                onClick={() => changeTab("bookings")}
                 className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition ${
                   activeTab === "bookings"
                     ? "bg-white text-emerald-800 shadow-sm"
@@ -56,7 +73,7 @@ const ServicesPage = () => {
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
               </button>
               <button
-                onClick={() => setActiveTab("book-now")}
+                onClick={() => changeTab("book-now")}
                 className={`rounded-xl px-4 py-2 text-xs font-bold transition ${
                   activeTab === "book-now"
                     ? "bg-emerald-600 text-white shadow-sm"
