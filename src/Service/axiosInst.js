@@ -10,11 +10,6 @@ import axios from "axios";
 export const getApiBaseUrl = () => {
   const envUrl = (import.meta.env.VITE_PUBLIC_API_URL || "").trim().replace(/\/+$/, "");
 
-  // If a valid production URL (https://... or non-localhost) is specified, use it
-  if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
-    return envUrl;
-  }
-
   // Running inside a browser
   if (typeof window !== "undefined" && window.location) {
     const { hostname } = window.location;
@@ -26,19 +21,25 @@ export const getApiBaseUrl = () => {
       /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
       hostname.endsWith(".local");
 
+    // 1. If accessing via local Wi-Fi / LAN IP from phone or tablet, connect to local backend on port 5000
     if (isLanIp) {
-      // Connect to same host on port 5000
       return `http://${hostname}:5000`;
     }
 
+    // 2. If accessing on local PC browser (localhost / 127.0.0.1)
     if (hostname === "localhost" || hostname === "127.0.0.1") {
-      return envUrl || "http://localhost:5000";
+      return "http://localhost:5000";
     }
 
-    // If hosted on a cloud domain (like *.vercel.app)
+    // 3. If hosted on a cloud domain (like *.vercel.app, *.netlify.app, *.onrender.com)
     if (envUrl) {
       return envUrl;
     }
+  }
+
+  // Fallback for SSR or direct production API URL
+  if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
+    return envUrl;
   }
 
   return envUrl || "http://localhost:5000";
